@@ -122,7 +122,8 @@ export function initBot(): TelegramBot {
   if (!token) throw new Error("TELEGRAM_BOT_TOKEN não configurado");
 
   const bot = new TelegramBot(token, { polling: true });
-  setBotInstance(bot);
+setBotInstance(bot);
+bot.on("polling_error", () => {});
 
   // ============ /start ============
   bot.onText(/\/start/, async (msg) => {
