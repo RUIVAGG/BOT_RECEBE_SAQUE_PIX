@@ -1165,10 +1165,6 @@ bot.on("polling_error", () => {});
     }
   });
 
-  bot.on("polling_error", (err: any) => {
-    logger.error({ error: err.message }, "Polling error");
-  });
-
   bot.on("error", (err: any) => {
     logger.error({ error: err.message }, "Bot error");
   });
