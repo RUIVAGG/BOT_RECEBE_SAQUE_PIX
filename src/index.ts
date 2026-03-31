@@ -13,29 +13,35 @@ async function runMigrations() {
 }
 
 async function clearWebhook() {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  if (!token) return;
-  const tmp = new TelegramBot(token, { polling: false });
-  await tmp.deleteWebhook();
-  logger.info("Webhook removido, iniciando polling...");
+  try {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token) return;
+    const tmp = new TelegramBot(token, { polling: false });
+    await tmp.deleteWebhook();
+    logger.info("Webhook removido, iniciando polling...");
+  } catch (err: any) {
+    logger.warn({ error: err.message }, "Nao foi possivel remover webhook, continuando mesmo assim...");
+  }
 }
 
 const port = Number(process.env.PORT || 3000);
 
-runMigrations()
-  .then(() => clearWebhook())
-  .then(() => {
-    app.listen(port, () => {
-      logger.info({ port }, "Server listening");
-      try {
-        initBot();
-        logger.info("Orbita Pix Bot iniciado!");
-      } catch (botErr) {
-        logger.error({ err: botErr }, "Falha ao iniciar o bot Telegram");
-      }
-    });
-  })
-  .catch((err) => {
-    logger.error({ err }, "Erro nas migrations, encerrando");
-    process.exit(1);
+async function main() {
+  await runMigrations();
+  await clearWebhook();
+
+  app.listen(port, () => {
+    logger.info({ port }, "Server listening");
+    try {
+      initBot();
+      logger.info("Orbita Pix Bot iniciado!");
+    } catch (botErr) {
+      logger.error({ err: botErr }, "Falha ao iniciar o bot Telegram");
+    }
   });
+}
+
+main().catch((err) => {
+  logger.error({ err }, "Erro critico ao iniciar, encerrando");
+  process.exit(1);
+});
