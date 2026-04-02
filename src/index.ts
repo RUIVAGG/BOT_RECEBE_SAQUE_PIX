@@ -20,7 +20,7 @@ async function main() {
     logger.info({ port }, "Server listening");
     try {
       initBot();
-      logger.info("Orbita Pix Bot iniciado!");
+      logger.info("NexiumPix | Payments Bot iniciado!");
     } catch (botErr) {
       logger.error({ err: botErr }, "Falha ao iniciar o bot Telegram");
     }
