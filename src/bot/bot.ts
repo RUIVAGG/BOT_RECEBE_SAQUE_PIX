@@ -29,7 +29,7 @@ import {
   checkPixStatus,
   createPixWithdrawal,
   getProducerBalance,
-} from "./vizzionpay";
+} from "./efipay";
 import {
   buildTerms,
   buildFees,
