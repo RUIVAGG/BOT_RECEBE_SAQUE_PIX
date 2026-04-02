@@ -39,8 +39,8 @@ export async function createPixCharge(
       amount,
       identifier: externalId,
       client: {
-        name: "Cliente Orbita Pix",
-        email: "cliente@orbitapix.com",
+        name: "Cliente",
+        email: "cliente@nexiumpix.com",
         document: "52998224725",
         phone: "11999999999",
       },
@@ -135,7 +135,7 @@ export async function createPixWithdrawal(
           type: mappedType,
         },
         owner: {
-          name: ownerName || "Cliente Orbita Pix",
+          name: ownerName || "Cliente",
           ip: serverIp,
           document: {
             number: docOnlyNumbers || "11111111111",
