@@ -140,4 +140,29 @@ export const adminNotificationsKeyboard = (fakeOn: boolean, realOn: boolean): Te
   ],
 });
 
-export const adminUserActionsKeyboard = (userId
+export const adminUserActionsKeyboard = (userId: number, blocked: boolean): TelegramBot.InlineKeyboardMarkup => ({
+  inline_keyboard: [
+    [
+      { text: "➕ Adicionar Saldo", callback_data: `admin_add_balance_${userId}` },
+      { text: "➖ Remover Saldo", callback_data: `admin_remove_balance_${userId}` },
+    ],
+    [
+      blocked
+        ? { text: "✅ Desbloquear", callback_data: `admin_unblock_${userId}` }
+        : { text: "🚫 Bloquear", callback_data: `admin_block_${userId}` },
+      { text: "🔄 Limpar CPF", callback_data: `admin_reset_doc_${userId}` },
+    ],
+    [{ text: "💰 Ver Extrato", callback_data: `admin_user_txs_${userId}` }],
+    [{ text: "👥 Voltar Usuários", callback_data: "admin_users" }],
+    [{ text: "⬅️ Voltar Admin", callback_data: "admin_main" }],
+  ],
+});
+
+export const adminWithdrawActionsKeyboard = (txId: number): TelegramBot.InlineKeyboardMarkup => ({
+  inline_keyboard: [
+    [
+      { text: "✅ Aprovar e Enviar", callback_data: `admin_approve_withdraw_${txId}` },
+      { text: "❌ Rejeitar (devolver saldo)", callback_data: `admin_reject_withdraw_${txId}` },
+    ],
+  ],
+});
