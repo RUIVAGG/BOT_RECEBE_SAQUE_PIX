@@ -88,7 +88,7 @@ export function notifyNovoInscrito(botName: string = "NexiumPix | Payments"): st
   return (
     `🆕 𝗡𝗢𝗩𝗢 𝗜𝗡𝗦𝗖𝗥𝗜𝗧𝗢 𝗡𝗔 𝗣𝗟𝗔𝗧𝗔𝗙𝗢𝗥𝗠𝗔\n\n` +
     `🕐 ${hora}  📅 ${data}\n\n` +
-    `🎉 Bem-vindo à Orbita Pix!`
+    `🎉 Bem-vindo à ${botName}!`
   );
 }
 
