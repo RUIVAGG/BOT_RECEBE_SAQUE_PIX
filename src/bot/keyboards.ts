@@ -14,6 +14,10 @@ export const mainMenuKeyboard = (): TelegramBot.InlineKeyboardMarkup => ({
       { text: "🔑 Minha Chave Pix", callback_data: "menu_pix_key" },
       { text: "🎧 SAC / Suporte", callback_data: "menu_support" },
     ],
+    [
+      { text: "📜 Regras", callback_data: "menu_rules" },
+      { text: "💹 Taxas de Pix", callback_data: "menu_fees" },
+    ],
   ],
 });
 
