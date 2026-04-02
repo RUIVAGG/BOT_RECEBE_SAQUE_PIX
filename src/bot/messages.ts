@@ -47,7 +47,30 @@ export function buildTerms(settings: Record<string, string>): string {
     .replace(/{WITHDRAWAL_FEE}/g, settings.withdrawalFeePercent || "5");
 }
 
-export const WELCOME = (name: string, welcomeText: string, botName: string = "NexiumPix | Payments") =>
+export function buildFees(settings: Record<string, string>): string {
+    const botName = settings.botName || "NexiumPix | Payments";
+    const gatewayFee = parseFloat(settings.gatewayFeeFixed || "1").toFixed(2);
+    const platformFee = settings.platformFeePercent || "5";
+    const withdrawalGatewayFee = parseFloat(settings.withdrawalGatewayFeeFixed || "1").toFixed(2);
+    const withdrawalFee = settings.withdrawalFeePercent || "5";
+    const minDeposit = parseFloat(settings.minDeposit || "2").toFixed(2);
+    const minWithdrawal = parseFloat(settings.minWithdrawal || "5").toFixed(2);
+
+    return (
+      `💹 *Taxas — ${botName}*\n\n` +
+      `📥 *Recebimento:*\n` +
+      `• Valor mínimo: *R$ ${minDeposit}*\n` +
+      `• Taxa fixa gateway: *R$ ${gatewayFee}*\n` +
+      `• Taxa da plataforma: *${platformFee}%* sobre o valor recebido\n\n` +
+      `📤 *Saque:*\n` +
+      `• Valor mínimo: *R$ ${minWithdrawal}*\n` +
+      `• Taxa fixa gateway: *R$ ${withdrawalGatewayFee}*\n` +
+      `• Taxa de saque: *${withdrawalFee}%* sobre o saldo\n\n` +
+      `ℹ️ Taxas descontadas automaticamente em cada operação.`
+    );
+  }
+
+  export const WELCOME = (name: string, welcomeText: string, botName: string = "NexiumPix | Payments") =>
   `✨ *Bem-vindo ao ${botName}, ${name}!* ✨\n\n${welcomeText}`;
 
 export const formatCurrency = (value: number | string) => {
