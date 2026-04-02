@@ -51,3 +51,6 @@ CREATE TABLE IF NOT EXISTS bot_settings (
   value TEXT NOT NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+INSERT INTO bot_settings (key, value) VALUES ('botName', 'NexiumPix | Payments') ON CONFLICT (key) DO NOTHING;
+INSERT INTO bot_settings (key, value) VALUES ('welcomeText', '💫 Sua plataforma para receber e sacar Pix com total segurança.\n\nEscolha uma opção abaixo:') ON CONFLICT (key) DO NOTHING;
