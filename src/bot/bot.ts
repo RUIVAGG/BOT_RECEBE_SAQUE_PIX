@@ -83,7 +83,7 @@ function clearSession(telegramId: string) {
 
 // ============ Enviar boas-vindas com ou sem imagem ============
 async function sendWelcome(bot: TelegramBot, chatId: number, name: string, settings: Record<string, string>, keyboard: TelegramBot.InlineKeyboardMarkup) {
-  const text = WELCOME(name, settings.welcomeText || "💫 Sua plataforma para receber e sacar Pix com total segurança.\n\nEscolha uma opção abaixo:");
+  const text = WELCOME(name, settings.welcomeText || "💫 Sua plataforma para receber e sacar Pix com total segurança.\n\nEscolha uma opção abaixo:", settings.botName || "NexiumPix | Payments");
   const imageId = settings.welcomeImage || "";
 
   if (imageId) {
@@ -100,7 +100,7 @@ async function sendWelcome(bot: TelegramBot, chatId: number, name: string, setti
 }
 
 async function editOrSendWelcome(bot: TelegramBot, chatId: number, msgId: number, name: string, settings: Record<string, string>) {
-  const text = WELCOME(name, settings.welcomeText || "💫 Sua plataforma para receber e sacar Pix com total segurança.\n\nEscolha uma opção abaixo:");
+  const text = WELCOME(name, settings.welcomeText || "💫 Sua plataforma para receber e sacar Pix com total segurança.\n\nEscolha uma opção abaixo:", settings.botName || "NexiumPix | Payments");
   const imageId = settings.welcomeImage || "";
 
   if (imageId) {
@@ -144,7 +144,7 @@ bot.on("polling_error", () => {});
     const settings = await getAllSettings();
 
     if (isNewUser) {
-      sendRealNotification(bot, notifyNovoInscrito());
+      sendRealNotification(bot, notifyNovoInscrito(settings.botName || "NexiumPix | Payments"));
     }
 
     if (!user.acceptedTerms) {
@@ -168,7 +168,8 @@ bot.on("polling_error", () => {});
       await bot.sendMessage(msg.chat.id, "⛔ Acesso negado.");
       return;
     }
-    await bot.sendMessage(msg.chat.id, "🛸 *PAINEL ADMIN — ORBITA PIX*", {
+    const settings = await getAllSettings();
+    await bot.sendMessage(msg.chat.id, `🛸 *PAINEL ADMIN — ${settings.botName || "NexiumPix | Payments"}*`, {
       parse_mode: "Markdown",
       reply_markup: adminMainKeyboard(),
     });
@@ -208,11 +209,12 @@ bot.on("polling_error", () => {});
 
     // ---- Admin: Broadcast ----
     if (telegramId === ADMIN_ID && session.state === "admin_broadcast") {
+      const settings = await getAllSettings();
       const users = await getAllUsers(1000, 0);
       let sent = 0;
       for (const u of users) {
         try {
-          await bot.sendMessage(u.telegramId, `📢 *Mensagem da Orbita Pix:*\n\n${text}`, { parse_mode: "Markdown" });
+          await bot.sendMessage(u.telegramId, `📢 *Mensagem da ${settings.botName || "NexiumPix | Payments"}:*\n\n${text}`, { parse_mode: "Markdown" });
           sent++;
         } catch { }
       }
@@ -225,8 +227,9 @@ bot.on("polling_error", () => {});
     if (telegramId === ADMIN_ID && session.state === "admin_reply_ticket") {
       const ticketId = session.data.ticketId;
       const userTelegramId = session.data.userTelegramId;
+      const settings = await getAllSettings();
       await resolveTicket(ticketId, text);
-      await bot.sendMessage(userTelegramId, `📩 *Resposta do Suporte Orbita Pix:*\n\n${text}`, { parse_mode: "Markdown" });
+      await bot.sendMessage(userTelegramId, `📩 *Resposta do Suporte ${settings.botName || "NexiumPix | Payments"}:*\n\n${text}`, { parse_mode: "Markdown" });
       clearSession(telegramId);
       await bot.sendMessage(msg.chat.id, "✅ Resposta enviada ao usuário.", { reply_markup: adminMainKeyboard() });
       return;
@@ -324,7 +327,9 @@ bot.on("polling_error", () => {});
 
       clearSession(telegramId);
       const labels: Record<string, string> = {
-        welcomeText: "Texto de boas-vindas",
+        botName: "Nome do Bot",
+          termsText: "Termos de Uso",
+          welcomeText: "Texto de boas-vindas",
         platformFeePercent: "Taxa da plataforma",
         gatewayFeeFixed: "Taxa gateway receber",
         withdrawalGatewayFeeFixed: "Taxa gateway saque",
@@ -491,7 +496,8 @@ bot.on("polling_error", () => {});
     }
 
     if (data === "decline_terms") {
-      await bot.editMessageText("❌ Você recusou os termos. Para usar o Orbita Pix, é necessário aceitar. Use /start para tentar novamente.", {
+      const settings = await getAllSettings();
+      await bot.editMessageText(`❌ Você recusou os termos. Para usar o ${settings.botName || "NexiumPix | Payments"}, é necessário aceitar. Use /start para tentar novamente.`, {
         chat_id: chatId, message_id: msgId,
       });
       return;
@@ -715,17 +721,19 @@ bot.on("polling_error", () => {});
     if (telegramId !== ADMIN_ID) return;
 
     if (data === "admin_main") {
-      await bot.editMessageText("🛸 *PAINEL ADMIN — ORBITA PIX*", {
+      const settings = await getAllSettings();
+      await bot.editMessageText(`🛸 *PAINEL ADMIN — ${settings.botName || "NexiumPix | Payments"}*`, {
         chat_id: chatId, message_id: msgId, parse_mode: "Markdown", reply_markup: adminMainKeyboard(),
       });
       return;
     }
 
     if (data === "admin_stats") {
+      const settings = await getAllSettings();
       const stats = await getStats();
       const balance = await getProducerBalance();
       await bot.editMessageText(
-        `📊 *Estatísticas Orbita Pix*\n\n` +
+        `📊 *Estatísticas ${settings.botName || "NexiumPix | Payments"}*\n\n` +
         `👥 Total de usuários: *${stats.totalUsers}*\n` +
         `✅ Usuários ativos: *${stats.activeUsers}*\n\n` +
         `💰 Total depositado: *${formatCurrency(stats.totalDeposited)}*\n` +
@@ -930,7 +938,9 @@ bot.on("polling_error", () => {});
       const s = await getAllSettings();
       await bot.editMessageText(
         `⚙️ *Configurações Atuais do Bot*\n\n` +
+        `🏷️ Nome do Bot: *${s.botName || "NexiumPix | Payments"}*\n` +
         `✏️ Texto boas-vindas: ${(s.welcomeText || "").slice(0, 40)}...\n` +
+        `📜 Termos: ${s.termsText ? "✅ Personalizado" : "⬜ Padrão"}\n` +
         `🖼️ Imagem: ${s.welcomeImage ? "✅ Configurada" : "❌ Nenhuma"}\n\n` +
         `💲 Taxa gateway receber: *R$ ${parseFloat(s.gatewayFeeFixed || "1").toFixed(2)}* (fixo)\n` +
         `💲 Taxa plataforma: *${s.platformFeePercent || "5"}%*\n` +
@@ -945,6 +955,8 @@ bot.on("polling_error", () => {});
 
     // Editar configurações individuais
     const settingActions: Record<string, { key: string; label: string; hint: string }> = {
+      admin_set_bot_name:        { key: "botName",               label: "Nome do Bot",             hint: "Digite o nome do bot (ex: NexiumPix | Payments):" },
+      admin_set_terms_text:      { key: "termsText",             label: "Termos de Uso",           hint: "Digite o texto completo dos termos (use {BOT_NAME}, {MIN_DEPOSIT}, {MIN_WITHDRAWAL}, {GATEWAY_FEE}, {PLATFORM_FEE}, {WITHDRAWAL_GATEWAY_FEE}, {WITHDRAWAL_FEE} como variáveis):" },
       admin_set_welcome_text:    { key: "welcomeText",           label: "Texto de Boas-vindas",    hint: "Digite o novo texto de boas-vindas:" },
       admin_set_platform_fee:   { key: "platformFeePercent",    label: "Taxa da Plataforma",       hint: "Digite o percentual da taxa da plataforma (ex: 5 para 5%):" },
       admin_set_gateway_fee:    { key: "gatewayFeeFixed",       label: "Taxa Gateway Receber",     hint: "Digite o valor fixo da taxa do gateway para receber em R$ (ex: 1):" },
@@ -1169,7 +1181,7 @@ bot.on("polling_error", () => {});
     logger.error({ error: err.message }, "Bot error");
   });
 
-  logger.info("Bot Orbita Pix iniciado com sucesso!");
+  logger.info("NexiumPix | Payments Bot iniciado com sucesso!");
 
   autoStartFakeIfEnabled(bot);
 
@@ -1323,7 +1335,7 @@ async function processWithdrawal(bot: TelegramBot, txId: number, pixKey: string,
   let payoutDone = false;
   let payoutResultId = "";
   try {
-    const result = await createPixWithdrawal(netAmount, pixKey, pixKeyType, `orbita_w_${txId}_${Date.now()}`, ownerName, ownerDocument);
+    const result = await createPixWithdrawal(netAmount, pixKey, pixKeyType, `nexium_w_${txId}_${Date.now()}`, ownerName, ownerDocument);
     payoutDone = true;
     payoutResultId = result.id || "";
     await updateTransactionStatus(txId, "completed", `VizzionPay: ${payoutResultId}`);
