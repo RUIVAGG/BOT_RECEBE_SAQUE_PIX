@@ -32,6 +32,7 @@ import {
 } from "./vizzionpay";
 import {
   buildTerms,
+  buildFees,
   WELCOME,
   formatCurrency,
   calcDeposit,
@@ -705,6 +706,22 @@ bot.on("polling_error", () => {});
       sendRealNotification(bot, notifySolicitacaoSaque(saqueNotifFees));
 
       processWithdrawal(bot, tx.id, user.pixKey!, user.pixKeyType!, calc.net, telegramId, user.id, amount, user.firstName || "Cliente", ownerDocument);
+      return;
+    }
+
+    // ---- REGRAS ----
+    if (data === "menu_rules") {
+      await bot.editMessageText(buildTerms(settings), {
+        chat_id: chatId, message_id: msgId, parse_mode: "Markdown", reply_markup: backToMenuKeyboard(),
+      });
+      return;
+    }
+
+    // ---- TAXAS DE PIX ----
+    if (data === "menu_fees") {
+      await bot.editMessageText(buildFees(settings), {
+        chat_id: chatId, message_id: msgId, parse_mode: "Markdown", reply_markup: backToMenuKeyboard(),
+      });
       return;
     }
 
