@@ -83,7 +83,7 @@ export function notifySaqueConcluido(fees: SaqueFees): string {
   );
 }
 
-export function notifyNovoInscrito(): string {
+export function notifyNovoInscrito(botName: string = "NexiumPix | Payments"): string {
   const { hora, data } = now();
   return (
     `🆕 𝗡𝗢𝗩𝗢 𝗜𝗡𝗦𝗖𝗥𝗜𝗧𝗢 𝗡𝗔 𝗣𝗟𝗔𝗧𝗔𝗙𝗢𝗥𝗠𝗔\n\n` +
